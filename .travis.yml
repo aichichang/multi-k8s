@@ -2,8 +2,13 @@ language: generic
 sudo: required
 services:
   - docker
-
+env:
+  global:
+    - SHA=$(git rev-parse HEAD)
+    # This will stop Goggle Cloud CLI does not ask any questions in the commandline as we cannot respond to it
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 before_install:
+  # This is generated fron travis ebcrypt-file... command
   - openssl aes-256-cbc -K $encrypted_9f3b5599b056_key -iv $encrypted_9f3b5599b056_iv -in service-account.json.enc -out service-account.json -d
   # this will download the sdk from Google, 
   # and the part after "\" will be installed locally on our instance that is assigned by Travis.CI 
@@ -15,3 +20,19 @@ before_install:
   # The activate-service-account is telling Google that who is signing in, 
   # and the login credential can be found in service-account.json files which is created by us.
   - gcloud auth activate-service-account --key-file service-account.json
+  # the project name (multi-k8s-291911) is the id that we can find from our Google cloud
+  - gcloud config set project multi-k8s-291911
+  # this is the AZ that we choosed when creating the cluster, the name can be found from Google Cloud
+  - gcloud config set compute/zone us-central1-c
+  # the cluster name can be foubd on Google cloud/kubernetes engine/clusters
+  - gcloud container clusters get-credentials multi-cluster
+  # login to our docker
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker build -t aichichangnandos/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true aichichangnandos/react-test npm test
+
+deploy:
+  provider: script
+  script: basg ./deploy.sh
