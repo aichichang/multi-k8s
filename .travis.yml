@@ -36,3 +36,5 @@ script:
 deploy:
   provider: script
   script: basg ./deploy.sh
+  on:
+    branch: master
