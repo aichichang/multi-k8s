@@ -4,39 +4,14 @@ services:
   - docker
 
 before_install:
-  # -t tage the name with Docker id/tag, 
-  # -f to specify the rout for the Dockerfile.dev, 
-  # and as we have a nested folder, we want it to look into ./client to look for the build file
-  - docker build -t aichichangnandos/react-test -f ./client/Dockerfile.dev ./client
-  # if we need to build and run test for another project, we can run - docker build........
-
-script:
-  - docker run -e CI=true aichichangnandos/react-test npm test
-  # and - docker run another prject's test file
-
-after_success:
-  # this time we don't need to specify with the -f cause docker will look for the 'Dockerfile' automatically
-  - docker build -t aichichangnandos/multi-client ./client
-  - docker build -t aichichangnandos/multi-nginx ./nginx
-  - docker build -t aichichangnandos/multi-server ./server
-  - docker build -t aichichangnandos/multi-worker ./worker
-  # log in to the docker CLI
-  # we do the login in one command
-  # Echo the password and stand in to the login, when docker login, it will take the id from DOCKER_ID and the stand in password
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-
-  # take those images and push them to docker hub
-  - docker push aichichangnandos/multi-client
-  - docker push aichichangnandos/multi-nginx
-  - docker push aichichangnandos/multi-server
-  - docker push aichichangnandos/multi-worker
-
-# deploy:
-#   provider: elasticbeanstalk
-#   region: "us-east-1"
-#   name: "multi-docker"
-#   env: "DockerComplex-env"
-#   bucket_name: "elasticbeanstalk-us-east-1-704623156014"
-#   bucket_path: "docker-multi"
-#   access_key_id: $AWS_ACCESS_KEY
-#   secret_access_key: $AWS_SECRET_KEY
+  - openssl aes-256-cbc -K $encrypted_9f3b5599b056_key -iv $encrypted_9f3b5599b056_iv -in service-account.json.enc -out service-account.json -d
+  # this will download the sdk from Google, 
+  # and the part after "\" will be installed locally on our instance that is assigned by Travis.CI 
+  - curl https://sdk.cloud.google.com | bash > /dev/null;
+  # This will look at the default install directory on Google sdk, and modify our shell 
+  - source $HOME/google-cloud-sdk/path.bash.inc
+  # This will install and update a kubectl inside of our Travis environment
+  - gcloud components update kubectl
+  # The activate-service-account is telling Google that who is signing in, 
+  # and the login credential can be found in service-account.json files which is created by us.
+  - gcloud auth activate-service-account --key-file service-account.json
