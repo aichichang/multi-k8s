@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: postgres
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+      # Here we tell k8s what kind of storgae we want and where should it to look fot the config
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            # claim name is from our database-persistent-volume-claim.yaml file
+            # this is like a flag to tell k8s where to look for the configuration
+            claimName: database-persistent-volume-claim
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432
+            # and here we privision the volume
+          volumeMounts:
+            # the name here with the name in our volumes' name is identical
+            - name: postgres-storage
+            # this is where k8s save data in our local hard drive
+              mountPath: /var/lib/postgresql/data
+              # the subPath will override the default behavior, otherwise it will save data directly inside the data folder.
+              # which might leads to that K8s doesn't know that we are working with Docker blah blah blah
+              subPath: postgres
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom: 
+                secretKeyRef:
+                  name: pgpassword
+                  key: PGPASSWORD

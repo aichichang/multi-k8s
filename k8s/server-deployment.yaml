@@ -17,3 +17,27 @@ spec:
           image: aichichangnandos/multi-server
           ports:
             - containerPort: 5000
+          env:
+            - name: REDIS_HOST
+              value: redis-cluster-ip-service
+            - name: REDIS_PORT
+              value: '6379'
+            - name: PGUSER
+              value: postgres
+            - name: PGHOST
+              value: postgres-cluster-ip-service
+            - name: PGPORT
+              value: '5432'
+            - name: PGDATABASE
+              value: postgres
+              # we will create our password as a secret manually in our commandline
+              # Due to a change to Postgres on Dockerhub, we don't call it PGPASSWORD, but POSTRES_PASSWORD instead
+            - name: POSTGRES_PASSWORD
+              valueFrom: 
+                secretKeyRef: 
+                  # the name is create by us while configuring the secret (after generic)
+                  # kubectl create secret generic pgpassword --from-literal PGPASSWORD=*********
+                  name: pgpassword
+                  # the key pair value was set by us as well (after --from-literal)
+                  key: PGPASSWORD
+                  
