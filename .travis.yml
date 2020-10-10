@@ -25,7 +25,7 @@ before_install:
   # this is the AZ that we choosed when creating the cluster, the name can be found from Google Cloud
   - gcloud config set compute/zone us-central1-c
   # the cluster name can be foubd on Google cloud/kubernetes engine/clusters
-  - gcloud container clusters get-credentials multi-cluster
+  - gcloud container clusters get-credentials multi-cluster --zone us-central1-c --project multi-k8s-291911
   # login to our docker
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker build -t aichichangnandos/react-test -f ./client/Dockerfile.dev ./client
