@@ -38,6 +38,6 @@ spec:
                   # the name is create by us while configuring the secret (after generic)
                   # kubectl create secret generic pgpassword --from-literal PGPASSWORD=*********
                   name: pgpassword
-                  # the key pair value was set by us as well (after --from-literal)
+                  # the key pair value was set by us as well (after --from-literal )
                   key: PGPASSWORD
                   

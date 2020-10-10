@@ -33,6 +33,7 @@ spec:
               # the subPath will override the default behavior, otherwise it will save data directly inside the data folder.
               # which might leads to that K8s doesn't know that we are working with Docker blah blah blah
               subPath: postgres
+          # env
           env:
             - name: POSTGRES_PASSWORD
               valueFrom: 
