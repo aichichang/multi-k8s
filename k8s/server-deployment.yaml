@@ -32,7 +32,7 @@ spec:
               value: postgres
               # we will create our password as a secret manually in our commandline
               # Due to a change to Postgres on Dockerhub, we don't call it PGPASSWORD, but POSTRES_PASSWORD instead
-            - name: PGPASSWORD
+            - name: POSTGRES_PASSWORD
               valueFrom: 
                 secretKeyRef: 
                   # the name is create by us while configuring the secret (after generic)

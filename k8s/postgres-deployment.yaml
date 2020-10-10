@@ -34,7 +34,7 @@ spec:
               # which might leads to that K8s doesn't know that we are working with Docker blah blah blah
               subPath: postgres
           env:
-            - name: PGPASSWORD
+            - name: POSTGRES_PASSWORD
               valueFrom: 
                 secretKeyRef:
                   name: pgpassword
